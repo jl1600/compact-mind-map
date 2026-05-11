@@ -1,0 +1,8 @@
+node_modules/
+src/
+tsconfig.json
+package-lock.json
+.vscode/
+test/
+cmm/
+*.log

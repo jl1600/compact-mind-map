@@ -1,0 +1,229 @@
+{
+  "name": "cmm-editor-support",
+  "displayName": "CMM Editor Support",
+  "description": "Compact indent mindmap 编辑器增强：rainbow缩进、折叠、路径预览、子树拖拽、冻结、补全",
+  "version": "0.1.0",
+  "publisher": "local",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": ["Other"],
+  "activationEvents": [
+    "onLanguage:cmm",
+    "onView:cmmExplorer"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "cmm-explorer",
+          "title": "CMM Explorer",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "cmm-explorer": [
+        {
+          "id": "cmmExplorer",
+          "name": "CMM Explorer"
+        }
+      ]
+    },
+    "languages": [
+      {
+        "id": "cmm",
+        "aliases": ["CMM", "Compact Mindmap"],
+        "filenamePatterns": ["*cmm*"]
+      }
+    ],
+    "configurationDefaults": {
+      "[cmm]": {
+        "editor.foldingHighlight": false,
+        "editor.stickyScroll.enabled": true
+      }
+    },
+    "configuration": [
+      {
+        "title": "CMM",
+        "properties": {
+          "cmm.ignorePatterns": {
+            "type": "array",
+            "items": { "type": "string" },
+            "default": [],
+            "description": "gitignore 风格的忽略 pattern, 不想创建 .cmmignore 文件时直接在这里写。和 .cmmignore 合并生效, .cmmignore 优先。"
+          },
+          "cmm.useDefaultIgnore": {
+            "type": "boolean",
+            "default": true,
+            "description": "是否启用内置默认忽略规则 (node_modules/, .git/, out/, dist/, build/)"
+          }
+        }
+      }
+    ],
+    "commands": [
+      {
+        "command": "cmm.moveSubtreeUp",
+        "title": "CMM: Move Subtree Up"
+      },
+      {
+        "command": "cmm.moveSubtreeDown",
+        "title": "CMM: Move Subtree Down"
+      },
+      {
+        "command": "cmm.indentSubtreeRight",
+        "title": "CMM: Indent Subtree Right"
+      },
+      {
+        "command": "cmm.indentSubtreeLeft",
+        "title": "CMM: Indent Subtree Left"
+      },
+      {
+        "command": "cmm.selectSubtree",
+        "title": "CMM: Select Subtree"
+      },
+      {
+        "command": "cmm.addToCmmignore",
+        "title": "Add to .cmmignore"
+      },
+      {
+        "command": "cmm.addToGitignore",
+        "title": "Add to .gitignore"
+      },
+      {
+        "command": "cmm.openToSide",
+        "title": "Open to the Side"
+      },
+      {
+        "command": "cmm.copyPath",
+        "title": "Copy Path"
+      },
+      {
+        "command": "cmm.copyRelativePath",
+        "title": "Copy Relative Path"
+      },
+      {
+        "command": "cmm.revealInFileExplorer",
+        "title": "Reveal in File Explorer"
+      },
+      {
+        "command": "cmm.revealInVSCodeExplorer",
+        "title": "Reveal in Explorer View"
+      },
+      {
+        "command": "cmm.openContainingFolder",
+        "title": "Open Containing Folder"
+      },
+      {
+        "command": "cmm.renameFile",
+        "title": "Rename"
+      }
+    ],
+    "menus": {
+      "view/item/context": [
+        {
+          "command": "cmm.openToSide",
+          "when": "view == cmmExplorer && viewItem =~ /cmmFile/",
+          "group": "navigation"
+        },
+        {
+          "command": "cmm.renameFile",
+          "when": "view == cmmExplorer",
+          "group": "1_modification"
+        },
+        {
+          "command": "cmm.addToCmmignore",
+          "when": "view == cmmExplorer",
+          "group": "1_modification"
+        },
+        {
+          "command": "cmm.addToGitignore",
+          "when": "view == cmmExplorer",
+          "group": "1_modification"
+        },
+        {
+          "command": "cmm.copyPath",
+          "when": "view == cmmExplorer",
+          "group": "2_utilities"
+        },
+        {
+          "command": "cmm.copyRelativePath",
+          "when": "view == cmmExplorer",
+          "group": "2_utilities"
+        },
+        {
+          "command": "cmm.revealInFileExplorer",
+          "when": "view == cmmExplorer",
+          "group": "2_utilities"
+        },
+        {
+          "command": "cmm.revealInVSCodeExplorer",
+          "when": "view == cmmExplorer",
+          "group": "2_utilities"
+        },
+        {
+          "command": "cmm.openContainingFolder",
+          "when": "view == cmmExplorer",
+          "group": "2_utilities"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "cmm.moveSubtreeUp",
+        "key": "alt+up",
+        "when": "editorTextFocus && editorLangId == cmm"
+      },
+      {
+        "command": "cmm.moveSubtreeDown",
+        "key": "alt+down",
+        "when": "editorTextFocus && editorLangId == cmm"
+      },
+      {
+        "command": "cmm.indentSubtreeLeft",
+        "key": "alt+left",
+        "when": "editorTextFocus && editorLangId == cmm"
+      },
+      {
+        "command": "cmm.indentSubtreeRight",
+        "key": "alt+right",
+        "when": "editorTextFocus && editorLangId == cmm"
+      },
+      {
+        "command": "cmm.selectSubtree",
+        "key": "ctrl+l",
+        "when": "editorTextFocus && editorLangId == cmm"
+      },
+      {
+        "command": "-editor.action.moveLinesUpAction",
+        "key": "alt+up",
+        "when": "editorTextFocus && editorLangId == cmm"
+      },
+      {
+        "command": "-editor.action.moveLinesDownAction",
+        "key": "alt+down",
+        "when": "editorTextFocus && editorLangId == cmm"
+      },
+      {
+        "command": "-editor.action.outdentLines",
+        "key": "alt+left",
+        "when": "editorTextFocus && editorLangId == cmm"
+      },
+      {
+        "command": "-editor.action.indentLines",
+        "key": "alt+right",
+        "when": "editorTextFocus && editorLangId == cmm"
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.80.0",
+    "@types/node": "^18.0.0",
+    "typescript": "^5.0.0"
+  }
+}
