@@ -20,7 +20,7 @@ export class CmmDefinitionProvider implements vscode.DefinitionProvider {
     position: vscode.Position,
   ): vscode.ProviderResult<vscode.Definition> {
     const line = document.lineAt(position.line).text;
-    const charOffset = position.character; // 行内偏移, 不是文档偏移
+    const offset = document.offsetAt(position);
 
     // 找到光标位置所在的 @引用
     let match: RegExpExecArray | null;
@@ -28,7 +28,7 @@ export class CmmDefinitionProvider implements vscode.DefinitionProvider {
     while ((match = regex.exec(line)) !== null) {
       const start = match.index + 1; // 跳过@本身
       const end = match.index + match[0].length;
-      if (charOffset >= start && charOffset <= end) {
+      if (offset >= start && offset <= end) {
         let ref = match[1].replace(LINE_RANGE_SUFFIX, '');
         if (!ref) { continue; }
 
