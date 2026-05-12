@@ -28,14 +28,15 @@ import { CmmExplorer, CmmFileNode } from './features/cmmExplorer';
 import { CmmIgnore } from './features/cmmIgnore';
 import { activateRainbowIndent } from './providers/rainbowIndent';
 import { CmmDefinitionProvider } from './providers/definition';
+import { CmmPreviewProvider } from './providers/preview';
 
 export function activate(context: vscode.ExtensionContext) {
   // rainbow缩进: 不同层级用不同颜色
   activateRainbowIndent(context);
 
-  // @引用 Ctrl+Click 跳转到被引用的文件
+  // @引用 Ctrl+Click 跳转到被引用的文件 (cmm文件 + markdown文件都支持)
   const definitionProvider = vscode.languages.registerDefinitionProvider(
-    { language: 'cmm' },
+    [{ language: 'cmm' }, { language: 'markdown' }],
     new CmmDefinitionProvider()
   );
   context.subscriptions.push(definitionProvider);
@@ -199,6 +200,15 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.window.showErrorMessage(`重命名失败: ${err}`);
       }
     }),
+  );
+
+  // 思维导图预览
+  const previewProvider = new CmmPreviewProvider();
+  context.subscriptions.push(
+    vscode.commands.registerCommand('cmm.showPreview', () => previewProvider.showPreview(true)),
+    vscode.commands.registerCommand('cmm.showPreviewToSide', () => previewProvider.showPreviewToSide()),
+    vscode.workspace.onDidChangeTextDocument(e => previewProvider.onDocumentChanged(e.document)),
+    { dispose: () => previewProvider.dispose() },
   );
 }
 

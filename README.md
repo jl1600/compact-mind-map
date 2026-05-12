@@ -1,6 +1,6 @@
 # cmm-editor-support
 
-CMM (Compact Indent Mindmap) 编辑器增强插件。
+CMM (Compact Mind Map) 编辑器增强插件。
 
 @cmm编辑器支持.cmm.md
 
@@ -42,7 +42,7 @@ code --install-extension cmm-editor-support-0.1.0.vsix
 本项目同时维护 cmm 紧凑思维导图的 Claude Code skill 文件。把 skill 链接到 Claude 的 skill 目录即可使用：
 
 ```bash
-ln -s /home/lgl/github_repos/cmm-editor-support/cmm紧凑思维导图 ~/.claude/skills/cmm紧凑思维导图
+ln -s ~/github_repos/cmm-editor-support/cmm紧凑思维导图 ~/.claude/skills/cmm紧凑思维导图
 ```
 
 ## 文件忽略 (.cmmignore)

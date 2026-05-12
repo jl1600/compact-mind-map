@@ -1,7 +1,7 @@
 {
   "name": "cmm-editor-support",
   "displayName": "CMM Editor Support",
-  "description": "Compact indent mindmap 编辑器增强：rainbow缩进、折叠、路径预览、子树拖拽、冻结、补全",
+  "description": "Compact Mind Map (CMM) 编辑器增强：rainbow缩进、折叠、路径预览、子树拖拽、冻结、补全",
   "version": "0.1.0",
   "publisher": "local",
   "engines": {
@@ -34,8 +34,8 @@
     "languages": [
       {
         "id": "cmm",
-        "aliases": ["CMM", "Compact Mindmap"],
-        "filenamePatterns": ["*cmm*"]
+        "aliases": ["CMM", "Compact Mind Map"],
+        "extensions": [".cmm", ".cmm.md"]
       }
     ],
     "configurationDefaults": {
@@ -118,9 +118,33 @@
       {
         "command": "cmm.renameFile",
         "title": "Rename"
+      },
+      {
+        "command": "cmm.showPreview",
+        "title": "CMM: Open Preview",
+        "icon": "$(open-preview)"
+      },
+      {
+        "command": "cmm.showPreviewToSide",
+        "title": "CMM: Open Preview to the Side",
+        "icon": "$(open-preview)"
       }
     ],
     "menus": {
+      "editor/title": [
+        {
+          "command": "cmm.showPreview",
+          "when": "editorLangId == cmm",
+          "group": "navigation"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "cmm.showPreview",
+          "when": "editorLangId == cmm",
+          "group": "navigation"
+        }
+      ],
       "view/item/context": [
         {
           "command": "cmm.openToSide",
@@ -213,6 +237,11 @@
       {
         "command": "-editor.action.indentLines",
         "key": "alt+right",
+        "when": "editorTextFocus && editorLangId == cmm"
+      },
+      {
+        "command": "cmm.showPreviewToSide",
+        "key": "ctrl+shift+v",
         "when": "editorTextFocus && editorLangId == cmm"
       }
     ]

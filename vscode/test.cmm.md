@@ -31,7 +31,7 @@ cmm编辑器支持
       所有方向执行后选中整棵子树，光标落在首行有字处
       禁用了VSCode内置的Alt+方向键避免冲突
       suppressNext()防止autoExpand二次干扰selection
-      选中整行自动扩展到子树（autoExpand.ts），拖拽带子树走
+      选中整行自动扩展到子树（autoExpand.ts），拖拽带子树走 （VS Code 扩展 API 对内部文本拖拽的拦截能力非常有限  DocumentDropEditProvider只拦截外部内容拖放）
       Ctrl+L手动选中子树
     冻结
       已确认的内容冻结保护
@@ -50,7 +50,59 @@ cmm编辑器支持
       ✅ TreeView自定义视图, 绕开原生file nesting的一层限制
       支持递归嵌套和回环(互相引用)
       所有cmm文件按字典序排列
-  高级交互
+            思维导图预览
+      类似Markdown预览，以文本格式渲染CMM文件，保持原始缩进结构
+      一期只读预览，文本编辑仍在原编辑器进行
+      整体架构
+        触发方式
+          命令cmm.showPreview: 在当前编辑器旁边打开预览
+          命令cmm.showPreviewToSide: 在新分栏打开预览
+          快捷键Ctrl+Shift+V（与Markdown预览习惯一致）
+          编辑器标题栏右键菜单项
+          编辑器标题栏工具栏按钮
+        Webview面板
+          使用vscode.ViewColumn.Beside与源文件并排
+          同一时间只维护一个预览面板(单例)
+          自动跟随当前激活的CMM编辑器切换目标文件
+          编辑器关闭时预览自动关闭
+        渲染方案
+          纯文本HTML格式，保持原始缩进层级
+          每行以padding-left体现缩进深度（每层20px）
+          monospace字体，匹配编辑器风格
+          @引用节点用蓝色虚线下划线区分
+          ## !!注释节点灰色斜体显示
+          空行保留原样
+        交互功能
+          点击行 → 编辑器光标跳转到对应行(revealRange)
+          编辑器光标移动 → 预览中高亮对应行
+          折叠/展开: 有子节点的行显示折叠按钮(▼/▶)，收起隐藏子树
+          拖拽换位: 拖拽任意行到目标位置，松开后子树整体移动
+            ✅ 可拖拽到任意平级或上级节点前/后，不改变其他兄弟子树结构
+            鼠标在行上半部 → 蓝色上边框线 → 插入在目标前
+            鼠标在行下半部 → 蓝色下边框线 → 插入在目标后
+            后端: 移除src块→找目标节点(向上走到indent≤src)→insertBefore/After插入→WorkspaceEdit全文替换
+            新位置高亮动画: CSS @keyframes drop-highlight 0.5s背景色渐隐(暗金→透明)
+            不能拖入自身子树内
+        数据流
+          解析当前CMM文档 → CmmNode[] + 原始文本行
+          postMessage发送给webview渲染
+          编辑器文本变更 → onDidChangeTextDocument → 重新解析 → 重新渲染
+          webview点击行 → postMessage回扩展 → 编辑器revealRange
+          webview拖拽释放 → postMessage(srcLine, dstLine, insertBefore) → 找目标节点(向上走到indent≤src) → 移除子树块 → 目标位置插入 → 重新渲染
+        技术实现
+          新文件src/providers/preview.ts: CmmPreviewProvider类
+            管理webview panel生命周期
+            单例 + 自动follow当前CMM编辑器
+            监听onDidChangeActiveTextEditor切换目标
+            监听onDidChangeTextDocument实时刷新
+          webview内容内联HTML+CSS+JS
+            不依赖外部CDN资源
+            用acquireVsCodeApi()与扩展通信
+          package.json声明命令
+            cmm.showPreview
+            cmm.showPreviewToSide
+            菜单项editor/title和editor/context
+    高级交互
     模糊control
       每个词都是节点
       可以拖拽调整位置/层级
@@ -61,7 +113,7 @@ cmm编辑器支持
       用户思路导向：按用户当前思考方向组织
       社区自组织导向：按社区/算法自动聚合
   代码仓库
-    独立仓库 /home/lgl/github_repos/cmm-editor-support
+    独立仓库 ~/github_repos/cmm-editor-support
     README.md: 项目说明, @引用本cmm文件, 功能表格/安装/开发/结构
     vscode/ 目录：VSCode插件源码(编译产物不入库, 用户自行npm run compile)
       cmm/ : 设计讨论cmm文件(本项目级+子cmm)
