@@ -2,7 +2,8 @@
  * definition.ts - @引用 Ctrl+Click 跳转.
  *
  * 在 cmm 文件里, Ctrl+Click 或 F12 在 @xxx.cmm.md 引用上时,
- * 跳转到被引用的文件. 支持相对路径和文件名匹配.
+ * 跳转到被引用的文件. 用文本编辑器打开目标文件 + cmm preview 双开,
+ * 不走 VS Code 的 markdown preview.
  */
 
 import * as vscode from 'vscode';
@@ -10,17 +11,17 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 // 和 cmmExplorer.ts 保持一致的 @引用正则
-const REFERENCE_REGEX = /@([\w\u4e00-\u9fff\-./][\w\u4e00-\u9fff\-./]*?(?:\.[\w\u4e00-\u9fff\-]+)+|[\w\u4e00-\u9fff\-./]+\/)/g;
+const REFERENCE_REGEX = /@([\w一-鿿\-./][\w一-鿿\-./]*?(?:\.[\w一-鿿\-]+)+|[\w一-鿿\-./]+\/)/g;
 const LINE_RANGE_SUFFIX = /:\d+(?:-\d+)?$/;
 
 export class CmmDefinitionProvider implements vscode.DefinitionProvider {
 
-  provideDefinition(
+  async provideDefinition(
     document: vscode.TextDocument,
     position: vscode.Position,
-  ): vscode.ProviderResult<vscode.Definition> {
+  ): Promise<vscode.Definition | undefined> {
     const line = document.lineAt(position.line).text;
-    const offset = document.offsetAt(position);
+    const char = position.character;
 
     // 找到光标位置所在的 @引用
     let match: RegExpExecArray | null;
@@ -28,12 +29,17 @@ export class CmmDefinitionProvider implements vscode.DefinitionProvider {
     while ((match = regex.exec(line)) !== null) {
       const start = match.index + 1; // 跳过@本身
       const end = match.index + match[0].length;
-      if (offset >= start && offset <= end) {
+      if (char >= start && char <= end) {
         let ref = match[1].replace(LINE_RANGE_SUFFIX, '');
         if (!ref) { continue; }
 
         const targetUri = this.resolveReference(ref, document.uri);
         if (targetUri) {
+          // 显式用文本编辑器打开（不走 markdown preview），permanent tab
+          const doc = await vscode.workspace.openTextDocument(targetUri);
+          await vscode.window.showTextDocument(doc, { preview: false });
+          // 旁边开 cmm preview
+          vscode.commands.executeCommand('cmm.showPreviewToSide');
           return new vscode.Location(targetUri, new vscode.Position(0, 0));
         }
       }
