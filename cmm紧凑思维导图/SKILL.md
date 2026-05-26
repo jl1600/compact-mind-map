@@ -497,36 +497,6 @@ Best Practise MUST DO
          格式: blast_radius: 一句话描述波及范围
          例: blast_radius: neo4j_controller所有READ描述关系 + neo4j_utils + falkordb_controller + chapter_query_logic
          不标 = 不涉及或忘了标，AI读cmm时按上下文推断该不该有，该有就顺手补上
-       样板
-         图谱检索
-           流程
-             check alive schema（当前图谱里实际建了哪些类型的节点）
-               impl: @app/api/v3/query/query.py:check_alive_schema
-               state&assignee: done deepseek-v3
-               test: @tests/test_search.py:test_alive_schema_check
-               problem:
-             根据alive schema确定可用的retrieve policy列表
-               impl: @app/api/v3/query/query.py:determine_retrieve_policies
-               state&assignee: done deepseek-v3
-               test: @tests/test_search.py:test_policy_selection
-               problem:
-             每种节点类型有自己的三件套（query reconstruct / graph retrieve / rerank）
-               impl: @app/api/v3/query/query.py:apply_retrieve_policy
-               state&assignee: todo gpt-4o
-               test:
-               problem:
-             各类型各自出结果后，走global rerank policy合并排序
-               impl:
-               state&assignee: todo
-               test:
-               problem:
-         文件解析
-           接口
-             POST /api/v3/pipeline/parse_file_v2 解析文件
-               impl: @app/api/v3/pipeline/pipeline_v2.py:parse_file_v2
-               state&assignee: done deepseek-v3
-               test: @tests/test_parse.py:test_parse_pdf
-               problem:
         tracker审计
            AI作为主体（cmm式交流下AI是USER），应该主动审计cmm中spec的追踪标注
            审计方向
